@@ -98,3 +98,12 @@ def display_followings(request):
     return render(request, "network/followings.html", {
         'posts' : posts
     })
+
+
+def display_profile(request, user_id):
+    user_data = User.objects.get(id=user_id)
+    posts = Posts.objects.filter(creator = request.user)
+    return render(request, "network/profile.html", {
+        'posts': posts,
+        'user_data': user_data
+    })

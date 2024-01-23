@@ -1,22 +1,27 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
- <div class="mt-2 ml-3">
-        <h1 class="mb-4">All Posts</h1>
+    <div class="mt-2 ml-3">
+        <h1 class="mb-4">{{ user_data.username }}</h1>
 
-        <!-- Form for creating a new post -->
-        <div class="mb-4">
-            <form method="post" action="#">
-                {% csrf_token %}
-                
-                <div class="form-group">
-                    <label for="post_content">New Post:</label>
-                    <textarea class="form-control w-50" id="post_content" name="post_content" rows="4" required></textarea>
-                </div>
-                
-                <button type="submit" class="btn btn-primary">Submit Post</button>
-            </form>
-        </div>
+        <!-- Follow/Unfollow Button -->
+        {% if request.user.is_authenticated and user_data != request.user %}
+            {% if user_data not in request.user.subscriptions.all %}
+                <form action="{% url 'follow_user' user_data.id %}" method="post" class="mb-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-sm">Follow</button>
+                </form>
+            {% else %}
+                <form action="{% url 'unfollow_user' user_data.id %}" method="post" class="mb-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Unfollow</button>
+                </form>
+            {% endif %}
+        {% endif %}
+
+        <!-- Number of Subscriptions and Followed Users -->
+        <p><strong>Subscriptions:</strong> {{ user_data.subscriptions.count }}</p>
+        <p><strong>Followed Users:</strong> {{ user_data.subscribers.count }}</p>
 
         <!-- Display existing posts -->
         {% for post in posts %}
@@ -24,9 +29,8 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <div class="d-flex align-items-center">
-                            <a href="{% url 'display_profile' post.creator.id %}">
-                                <h5 class="card-title mb-0">{{ post.creator }}</h5>
-                            </a>
+                            <h5 class="card-title mb-0">{{ post.creator }}</h5>
+                            <!-- Follow/Unfollow button for each post -->
                             {% if request.user.is_authenticated and post.creator != request.user %}
                                 {% if post.creator not in request.user.subscriptions.all %}
                                     <form action="{% url 'follow_user' post.creator.id %}" method="post" class="ml-2">
@@ -42,7 +46,6 @@
                                             Unfollow
                                         </button>
                                     </form>
-
                                 {% endif %}
                             {% endif %}
                         </div>
@@ -52,9 +55,5 @@
                 </div>
             </div>
         {% endfor %}
-
-
-
-
     </div>
 {% endblock %}
