@@ -1,7 +1,8 @@
+import json
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from datetime import datetime
 
@@ -31,7 +32,7 @@ def follow(request, user_id):
         request.user.subscriptions.add(user_to_follow)
         request.user.save()
 
-        return HttpResponseRedirect(reverse("index"))
+        return redirect(request.META['HTTP_REFERER'])
 
 def unfollow(request, user_id):
     if request.method == "POST":
@@ -39,7 +40,7 @@ def unfollow(request, user_id):
         request.user.subscriptions.remove(user_to_unfollow)
         request.user.save()
 
-        return HttpResponseRedirect(reverse("index"))
+        return redirect(request.META['HTTP_REFERER'])
 
 def login_view(request):
     if request.method == "POST":
@@ -102,8 +103,32 @@ def display_followings(request):
 
 def display_profile(request, user_id):
     user_data = User.objects.get(id=user_id)
-    posts = Posts.objects.filter(creator = request.user)
+    posts = Posts.objects.filter(creator_id = user_id)
     return render(request, "network/profile.html", {
         'posts': posts,
         'user_data': user_data
     })
+
+
+def save_edit(request, post_id):
+    if request.method == 'POST':
+        # Get the raw JSON data from the request body
+        try:
+            data = json.loads(request.body)
+            edited_content = data.get('edited_content')
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+
+        # Update the post content in the database
+        try:
+            post = Posts.objects.get(pk=post_id)
+            post.post_text = edited_content
+            post.save()
+
+            # Return a JSON response with the updated content
+            return JsonResponse({'updated_content': edited_content})
+        except Posts.DoesNotExist:
+            return JsonResponse({'error': 'Post not found'}, status=404)
+    else:
+        # Return a 405 Method Not Allowed response for non-POST requests
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)

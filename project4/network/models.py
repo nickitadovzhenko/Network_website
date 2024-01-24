@@ -14,7 +14,7 @@ class Comments(models.Model):
 class Posts(models.Model):
     creator = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='creator')
-    post_text = models.TextField(blank=False)
+    post_text = models.TextField(blank=False, null = True)
     date = models.DateTimeField()
     likes = models.IntegerField(default = 1)
     comments = models.ForeignKey(
