@@ -1,27 +1,25 @@
 {% extends "network/layout.html" %}
-
+{% load static %}
 {% block body %}
+    <script>
+        window.csrf_token = "{{ csrf_token }}";
+    </script>
+    <script src = "{% static 'network/follow.js' %}"></script>
     <div class="mt-2 ml-3">
         <h1 class="mb-4">{{ user_data.username }}</h1>
 
         <!-- Follow/Unfollow Button -->
         {% if request.user.is_authenticated and user_data != request.user %}
             {% if user_data not in request.user.subscriptions.all %}
-                <form action="{% url 'follow_user' user_data.id %}" method="post" class="mb-2">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary btn-sm">Follow</button>
-                </form>
+                <button class="btn btn-primary btn-sm" id='follow' data-user-id="{{ user_data.id }}">Follow</button>
             {% else %}
-                <form action="{% url 'unfollow_user' user_data.id %}" method="post" class="mb-2">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger btn-sm">Unfollow</button>
-                </form>
+                <button class="btn btn-danger btn-sm follow-btn" id='follow' data-user-id="{{ user_data.id }}">Unfollow</button>
             {% endif %}
         {% endif %}
 
         <!-- Number of Subscriptions and Followed Users -->
-        <p><strong>Subscriptions:</strong> {{ user_data.subscriptions.count }}</p>
-        <p><strong>Followed Users:</strong> {{ user_data.subscribers.count }}</p>
+        <p id='subs'><strong>Subscriptions:</strong> {{ user_data.subscriptions.count }}</p>
+        <p id='followsCount' data-initial-count="{{ user_data.subscribers.count }}"><strong>Followed Users:</strong> {{ user_data.subscribers.count }}</p>
 
         <!-- Display existing posts -->
         {% for post in posts %}
@@ -31,23 +29,6 @@
                         <div class="d-flex align-items-center">
                             <h5 class="card-title mb-0">{{ post.creator }}</h5>
                             <!-- Follow/Unfollow button for each post -->
-                            {% if request.user.is_authenticated and post.creator != request.user %}
-                                {% if post.creator not in request.user.subscriptions.all %}
-                                    <form action="{% url 'follow_user' post.creator.id %}" method="post" class="ml-2">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-link btn-sm text-primary p-0 border-0">
-                                            Follow
-                                        </button>
-                                    </form>
-                                {% else %}
-                                    <form action="{% url 'unfollow_user' post.creator.id %}" method="post" class="ml-2">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-link btn-sm text-primary p-0 border-0">
-                                            Unfollow
-                                        </button>
-                                    </form>
-                                {% endif %}
-                            {% endif %}
                         </div>
                         <small class="text-muted">{{ post.date }}</small>
                     </div>

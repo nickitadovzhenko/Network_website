@@ -32,7 +32,7 @@ def follow(request, user_id):
         request.user.subscriptions.add(user_to_follow)
         request.user.save()
 
-        return redirect(request.META['HTTP_REFERER'])
+        return JsonResponse({'success': True})
 
 def unfollow(request, user_id):
     if request.method == "POST":
@@ -40,7 +40,7 @@ def unfollow(request, user_id):
         request.user.subscriptions.remove(user_to_unfollow)
         request.user.save()
 
-        return redirect(request.META['HTTP_REFERER'])
+        return JsonResponse({'success': True})
 
 def login_view(request):
     if request.method == "POST":

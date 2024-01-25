@@ -23,28 +23,14 @@
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div class="d-flex align-items-center">
                         <a href="{% url 'display_profile' post.creator.id %}">
-                            <h5 class="card-title mb-0">{{ post.creator }}</h5>
+                            <h5 class="card-title mb-0 mr-2">{{ post.creator }}</h5>
                         </a>
-                        {% if request.user.is_authenticated and post.creator != request.user %}
-                            {% if post.creator not in request.user.subscriptions.all %}
-                                <form action="{% url 'follow_user' post.creator.id %}" method="post" class="ml-2">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-link btn-sm text-primary p-0 border-0">
-                                        Follow
-                                    </button>
-                                </form>
-                            {% else %}
-                                <form action="{% url 'unfollow_user' post.creator.id %}" method="post" class="ml-2">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-link btn-sm text-primary p-0 border-0">
-                                        Unfollow
-                                    </button>
-                                </form>
-                            {% endif %}
-                        {% endif %}
+                        {% if request.user.is_authenticated and post.creator == request.user %}
                         <button class="btn btn-link btn-sm text-primary p-0 border-0 edit-post-btn" data-post-id="{{ post.id }}">
                             Edit
                         </button>
+                        {% endif %}
+                        
                     </div>
                     <small class="text-muted">{{ post.date }}</small>
                 </div>
@@ -59,7 +45,7 @@
     <script>
         window.csrf_token = "{{ csrf_token }}";
     </script>
-    <script src = "{% static 'network/app.js' %}"></script>
+    <script src = "{% static 'network/post_edit.js' %}"></script>
 </div>
 
 {% endblock %}
