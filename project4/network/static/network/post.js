@@ -2,7 +2,9 @@ document.addEventListener('DOMContentLoaded', function () {
   const editButtons = document.querySelectorAll('.edit-post-btn');
   const saveButtons = document.querySelectorAll('.save-edit-btn');
   const likeButtons = document.querySelectorAll('.like-btn');
-      
+  const commentButtons = document.querySelectorAll('.comment-btn');
+  const saveCommentButtons = document.querySelectorAll('.save-comment-btn');
+  const checkCommentsButtons = document.querySelectorAll('.check-commetns-btn')
   editButtons.forEach(button => {
     button.addEventListener('click', function () {
       const postId = button.getAttribute('data-post-id');
@@ -90,5 +92,50 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+  commentButtons.forEach(button => {
+    button.addEventListener('click', function () {
+      const postId = button.getAttribute('data-post-id');
+      const postContainer = document.getElementById(`post-${postId}`);
+      const commentContainer = postContainer.querySelector('.comment-container');
+      
+      commentContainer.style.display = 'block';
       
     });
+  });
+  
+  saveCommentButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const postId = button.getAttribute('data-post-id');
+        const postContainer = document.getElementById(`post-${postId}`);
+        const commentContainer = postContainer.querySelector('.comment-container');
+        const commentText = commentContainer.querySelector('textarea');
+        
+        const url = `/save_comment/${postId}`;
+        const data = { post_id: postId, comment_text: commentText.value };
+        
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": window.csrf_token,
+          },
+          body: JSON.stringify(data),
+        })
+          .then((response) => response.json())
+          .then((result) => {
+            if (result.success) {
+              commentContainer.style.display = 'none';
+            }
+            // Show the updated content and hide the edit container
+            
+          })
+          .catch((error) => console.error("Error:", error));
+        });
+  }); 
+  
+  checkCommentsButtons.forEach(button => {
+    button.addEventListener('click', function () {
+      alert("Hello World");
+    });
+  });
+  });

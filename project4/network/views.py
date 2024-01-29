@@ -1,5 +1,6 @@
 import json
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
@@ -7,7 +8,7 @@ from django.urls import reverse
 from datetime import datetime
 
 
-from .models import User, Comments, Posts
+from .models import User, Posts, Comments
 
 
 def index(request):
@@ -26,6 +27,8 @@ def index(request):
             'posts':posts,
         })
 
+
+@login_required
 def follow(request, user_id):
     if request.method == "POST":
         user_to_follow = User.objects.get(id=user_id)
@@ -34,6 +37,8 @@ def follow(request, user_id):
 
         return JsonResponse({'success': True})
 
+
+@login_required
 def unfollow(request, user_id):
     if request.method == "POST":
         user_to_unfollow = User.objects.get(id=user_id)
@@ -109,7 +114,7 @@ def display_profile(request, user_id):
         'user_data': user_data
     })
 
-
+@login_required
 def save_edit(request, post_id):
     if request.method == 'POST':
         # Get the raw JSON data from the request body
@@ -134,6 +139,7 @@ def save_edit(request, post_id):
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
 
 
+@login_required
 def like_post(request, post_id):
     if request.method == "POST":
         post = Posts.objects.get(pk=post_id)
@@ -143,11 +149,27 @@ def like_post(request, post_id):
         return JsonResponse({'success': True})
 
 
-
+@login_required
 def unlike_post(request, post_id):
     if request.method == "POST":
         post = Posts.objects.get(pk=post_id)
         user = User.objects.get(username=request.user)
         post.unlike_post(user)
+
+        return JsonResponse({'success': True})
+
+
+
+def save_comment(request, post_id):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        comment_text = data.get('comment_text')
+
+        post = Posts.objects.get(pk=post_id)
+        creator  = request.user
+        date = datetime.now()
+
+        new_comment = Comments(post= post, creator = creator, date = date, comment = comment_text)
+        new_comment.save()
 
         return JsonResponse({'success': True})

@@ -6,19 +6,11 @@ class User(AbstractUser):
     subscriptions = models.ManyToManyField(
         'self', symmetrical=False, blank=True, related_name='subscribers')
 
-class Comments(models.Model):
-    creator = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='comment_creator')
-    comment = models.TextField(blank = False)
-
-
 class Posts(models.Model):
     creator = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='creator')
     post_text = models.TextField(blank=False, null=True)
     date = models.DateTimeField()
-    comments = models.ForeignKey(
-        Comments, on_delete=models.CASCADE, related_name='comments', null=True, blank=True)
     liked_by_users = models.ManyToManyField(
         User, blank=True, related_name='liked_posts')
 
@@ -44,3 +36,15 @@ class Posts(models.Model):
         Method to get the total number of likes for the post.
         """
         return self.liked_by_users.count()
+
+
+class Comments(models.Model):
+    creator = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='comment_creator')
+    comment = models.TextField(blank=False)
+    date = models.DateTimeField()
+    post = models.ForeignKey(
+        Posts, on_delete=models.CASCADE, related_name='comments')
+
+    def __str__(self):
+        return f"{self.creator.username}'s Comment"
