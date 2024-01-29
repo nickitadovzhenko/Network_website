@@ -132,3 +132,22 @@ def save_edit(request, post_id):
     else:
         # Return a 405 Method Not Allowed response for non-POST requests
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+
+
+def like_post(request, post_id):
+    if request.method == "POST":
+        post = Posts.objects.get(pk=post_id)
+        user = User.objects.get(username = request.user)
+        post.like_post(user)
+
+        return JsonResponse({'success': True})
+
+
+
+def unlike_post(request, post_id):
+    if request.method == "POST":
+        post = Posts.objects.get(pk=post_id)
+        user = User.objects.get(username=request.user)
+        post.unlike_post(user)
+
+        return JsonResponse({'success': True})
