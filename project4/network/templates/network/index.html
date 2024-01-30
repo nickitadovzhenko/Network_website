@@ -16,53 +16,43 @@
         </form>
     </div>
 
-   <!-- Display existing posts -->
+    <!-- Display existing posts -->
     {% for post in posts %}
         <div class="card mb-3" id="post-{{ post.id }}">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex flex-column align-items-start align-items-center">
+                    <div class="d-flex align-items-center">
                         <a href="{% url 'display_profile' post.creator.id %}">
-                            <h5 class="card-title mb-0">{{ post.creator }}</h5>
+                            <h5 class="card-title mb-0 mr-2">{{ post.creator }}</h5>
                         </a>
                         {% if request.user.is_authenticated and post.creator == request.user %}
-                            <button class="btn btn-link btn-sm text-primary p-0 border-0 edit-post-btn" data-post-id="{{ post.id }}">
-                                Edit
-                            </button>
+                        <button class="btn btn-link btn-sm text-primary p-0 border-0 edit-post-btn" data-post-id="{{ post.id }}">
+                            Edit
+                        </button>
                         {% endif %}
+                        
                     </div>
-                    <div class="d-flex flex-column align-items-end align-items-center">
-                        <small class="text-muted">{{ post.date }}</small>
-
-                        <!-- Button under post.date -->
-                        <button class="btn btn-secondary btn-sm mt-2 check-commetns-btn" data-post-id="{{ post.id }}">Comments</button>
-                    </div>
+                    <small class="text-muted">{{ post.date }}</small>
                 </div>
-
+                
                 <p class="card-text">{{ post.post_text }}</p>
                 <!-- Like Button-->
                 <div class="d-flex align-items-center mb-2">
-                    {% if request.user.is_authenticated %}
-                        {% if request.user not in post.liked_by_users.all %}
-                            <button class="btn btn-sm btn-outline-danger like-btn" data-value = 'like' data-post-id="{{ post.id }}">
-                                <i class="bi bi-heart-fill" id ='heart'></i> 
-                            </button>
-                        {% else %}
-                            <button class="btn btn-sm btn-danger like-btn" data-value = 'unlike' data-post-id="{{ post.id }}">
-                                <i class="bi bi-heart-fill" id ='heart'></i>
-                            </button>
-                        {% endif %}
+                    {% if request.user not in post.liked_by_users.all %}
+                    <button class="btn btn-sm btn-outline-danger like-btn" data-value = 'like' data-post-id="{{ post.id }}">
+                        <i class="bi bi-heart-fill" id ='heart'></i> 
+                    </button>
+                    {% else %}
+                    <button class="btn btn-sm btn-danger like-btn" data-value = 'unlike' data-post-id="{{ post.id }}">
+                        <i class="bi bi-heart-fill" id ='heart'></i>
+                    </button>
                     {% endif %}
                     
-                    
-                    <p class="like-num ml-1 mb-0" data-like-number="{{post.get_total_likes}}">Likes: {{ post.get_total_likes }}</p>
+                    <p class="like-num ml-2 mb-0" data-like-number="{{post.get_total_likes}}">Likes: {{ post.get_total_likes }}</p>
                 </div>
 
                 <!--Comments-->
-                <div class="edit-post-container" style="display: none;">
-                    <textarea class="form-control w-50" rows="4">{{ post.post_text}}</textarea>
-                    <button class="btn btn-primary btn-sm mt-1 save-edit-btn" data-post-id="{{ post.id }}">Save</button>
-                </div>
+                
                 <button class="btn btn-link btn-sm text-primary p-0 border-0 comment-btn" data-post-id="{{ post.id }}">
                             Comment
                 </button>
@@ -70,7 +60,10 @@
                     <textarea class = 'form-control w-50' rows="4" required></textarea>
                     <button class = 'btn btn-primary btn-sm mt-1 save-comment-btn' data-post-id="{{ post.id }}">Leave a comment</button>
                 </div>
-                
+                <div class="edit-post-container" style="display: none;">
+                    <textarea class="form-control w-50" rows="4"></textarea>
+                    <button class="btn btn-primary btn-sm mt-1 save-edit-btn" data-post-id="{{ post.id }}">Save</button>
+                </div>
             </div>
         </div>
     {% endfor %}

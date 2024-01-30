@@ -14,6 +14,5 @@ urlpatterns = [
     path('dispay_profile/<int:user_id>', views.display_profile, name='display_profile'),
     path('save_edit/<int:post_id>/', views.save_edit, name='save_edit'),
     path('like_post/<int:post_id>', views.like_post, name='like_post'),
-    path('unlike_post/<int:post_id>', views.unlike_post, name='unlike_post'),
-    path('save_comment/<int:post_id>', views.save_comment, name= 'save_comment')
+    path('unlike_post/<int:post_id>', views.unlike_post, name='unlike_post')
 ]
